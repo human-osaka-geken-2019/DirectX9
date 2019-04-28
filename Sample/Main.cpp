@@ -8,11 +8,23 @@
 
 #pragma comment(lib, "../x64/Debug/DirectX9.lib")
 
+//	メモリリーク確認用マクロ
 #define _CRTDBG_MAP_ALLOC
 #define new ::new(_NORMAL_BLOCK, __FILE__, __LINE__)
 
+/**
+* @brief コールバック関数
+*/
 LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp);
+
+/**
+* @brief ウィンドウ枠の設定
+*/
 void SettingWindow(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR lpCmdLine, int nCmdShow);
+
+/**
+* @brief メッセージループ
+*/
 int MessageLoop();
 
 CUSTOMVERTEX customVertex[4]{
@@ -31,11 +43,13 @@ Dx9 dx9;
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR lpCmdLine, int nCmdShow)
 {
+	//	メモリリーク確認用マクロ
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 
 	SettingWindow(hInstance,hPrevInstance,lpCmdLine,nCmdShow);
 	dx9.BuildDXDevice(hWnd,_T("Blank.jpg"));
 
+	//	テクスチャの読み込み
 	D3DXCreateTextureFromFile(
 		dx9.pD3Device,
 		_T("Blank.jpg"),
@@ -77,7 +91,7 @@ void SettingWindow(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR lpCmdLine,
 {
 	WNDCLASS Wndclass;
 
-	//Windows初期化情報の設定
+	//Window初期化情報の設定
 	Wndclass.style = CS_HREDRAW | CS_VREDRAW;
 	Wndclass.lpfnWndProc = WndProc;
 	Wndclass.cbClsExtra = Wndclass.cbWndExtra = 0;
@@ -109,12 +123,14 @@ void SettingWindow(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR lpCmdLine,
 
 int MessageLoop()
 {
-
-	MSG msg;
-	DWORD SyncPrev = timeGetTime();	//	システム時間を取得
+	//	システム時間を取得
+	DWORD SyncPrev = timeGetTime();
 	DWORD SyncCurr;
-	timeBeginPeriod(1);
+
+	//	Windowsのメッセージの保存先
+	MSG msg;
 	ZeroMemory(&msg, sizeof(msg));
+	timeBeginPeriod(1);
 	while (msg.message != WM_QUIT)
 	{
 		Sleep(1);
@@ -126,7 +142,8 @@ int MessageLoop()
 		else
 		{
 			SyncCurr = timeGetTime();
-			if (SyncCurr - SyncPrev >= 1000 / 60)//1秒間に60回この中に入る
+			//1秒間に60回この中に入る
+			if (SyncCurr - SyncPrev >= 1000 / 60)
 			{
 				//ウィンドウを黒色でクリア
 				dx9.pD3Device->Clear(0, NULL, D3DCLEAR_TARGET, D3DCOLOR_XRGB(0x00, 0x00, 0x00), 1.0, 0);
