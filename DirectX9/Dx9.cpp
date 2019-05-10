@@ -18,6 +18,7 @@ Dx9::Dx9()
 
 Dx9::~Dx9()
 {
+	Release();
 }
 
 HRESULT Dx9::BuildDXDevice(HWND hWnd, const TCHAR* filePath) {
@@ -44,29 +45,14 @@ HRESULT Dx9::BuildDXDevice(HWND hWnd, const TCHAR* filePath) {
 		return E_FAIL;
 	}
 
-	InitPresentParameters(hWnd);
 
-	pDirect3D->CreateDevice(
-		D3DADAPTER_DEFAULT,
-		D3DDEVTYPE_HAL,
-		hWnd,
-		D3DCREATE_HARDWARE_VERTEXPROCESSING | D3DCREATE_MULTITHREADED,
-		&D3dPresentParameters, &pD3Device);
+	//アルファブレンドの設定
+	pD3Device->SetRenderState(D3DRS_ALPHABLENDENABLE, true);//透過処理を使用するか設定
+	pD3Device->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);  //SRCブレンドの設定
+	pD3Device->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);//DESTブレンドの設定
 
-	//生成チェック
-	if (pD3Device == NULL)
-	{
-		//生成に失敗したらDirectXオブジェクトを開放して終了する
-		pDirect3D->Release();
-		MessageBox(0, _T("Direct3Dの作成に失敗しました"), _T(""), MB_OK);
-		return E_FAIL;
-	}
-	//描画設定
-	pD3Device->SetRenderState(D3DRS_ALPHABLENDENABLE, true);
-	pD3Device->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);  //SRCの設定
-	pD3Device->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
-	//pD3Device->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);//カリングの設定
-
+	pD3Device->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);//カリングの設定
+	//テクスチャステージの設定
 	pD3Device->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_TEXTURE);
 	pD3Device->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_MODULATE);
 	pD3Device->SetTextureStageState(0, D3DTSS_ALPHAARG1, D3DTA_TEXTURE);
@@ -86,22 +72,16 @@ HRESULT Dx9::InitializeDx3Device(HWND hWnd,const TCHAR* filePath)
 		return E_FAIL;
 	}
 	// 「DIRECT3Dデバイス」オブジェクトの作成
-	D3DPRESENT_PARAMETERS d3dpp;
-	ZeroMemory(&d3dpp, sizeof(d3dpp));
-
-	d3dpp.BackBufferFormat = D3DFMT_UNKNOWN;
-	d3dpp.BackBufferCount = 1;
-	d3dpp.SwapEffect = D3DSWAPEFFECT_DISCARD;
-	d3dpp.Windowed = TRUE;
+	InitPresentParameters(hWnd);
 
 	if (FAILED(pDirect3D->CreateDevice(D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, hWnd,
 		D3DCREATE_MIXED_VERTEXPROCESSING,
-		&d3dpp, &pD3Device)))
+		&D3dPresentParameters, &pD3Device)))
 	{
 		MessageBox(0, _T("HALモードでDIRECT3Dデバイスを作成できません\nREFモードで再試行します"), NULL, MB_OK);
 		if (FAILED(pDirect3D->CreateDevice(D3DADAPTER_DEFAULT, D3DDEVTYPE_REF, hWnd,
 			D3DCREATE_MIXED_VERTEXPROCESSING,
-			&d3dpp, &pD3Device)))
+			&D3dPresentParameters, &pD3Device)))
 		{
 			MessageBox(0, _T("DIRECT3Dデバイスの作成に失敗しました"), NULL, MB_OK);
 			return E_FAIL;
@@ -115,6 +95,8 @@ HRESULT Dx9::InitializeDx3Device(HWND hWnd,const TCHAR* filePath)
 		MessageBox(0, _T("テクスチャの作成に失敗しました"), _T(""), MB_OK);
 		return E_FAIL;
 	}
+	ClearTexture();
+
 	return S_OK;
 }
 
@@ -185,6 +167,7 @@ bool Dx9::GetKeyState(int keyNumber) {
 
 void Dx9::Release()
 {
+	if (!pDirect3D) return;
 	ClearTexture();
 	ClearFont();
 	if (pDxIKeyDevice)
@@ -192,9 +175,13 @@ void Dx9::Release()
 		pDxIKeyDevice->Unacquire();
 	}
 	pDxIKeyDevice->Release();
+	pDxIKeyDevice = nullptr;
 	pDinput->Release();
+	pDinput = nullptr;
 	pD3Device->Release();
+	pD3Device = nullptr;
 	pDirect3D->Release();
+	pDirect3D = nullptr;
 }
 
 void Dx9::ClearTexture() {

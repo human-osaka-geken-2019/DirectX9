@@ -84,7 +84,6 @@ public:
 
 	/**
 	* @brief メモリ解放
-	* @details 一度呼んだら再生成するまで呼ばないこと
 	*/
 	void Release();
 
