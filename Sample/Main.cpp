@@ -6,8 +6,11 @@
 
 #include "Graphic.h"
 
+#ifdef _DEBUG
 #pragma comment(lib, "../x64/Debug/DirectX9.lib")
-
+#else
+#pragma comment(lib, "../x64/Release/DirectX9.lib")
+#endif
 //	メモリリーク確認用マクロ
 #define _CRTDBG_MAP_ALLOC
 #define new ::new(_NORMAL_BLOCK, __FILE__, __LINE__)
