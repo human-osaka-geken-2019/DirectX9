@@ -32,9 +32,9 @@ int MessageLoop();
 
 CUSTOMVERTEX customVertex[4]{
 	{10, 10, 0,1,0xFFFFFFFF,0,0},
-	{200,10, 0,1,0xFF00FFFF,0,0},
-	{200,200,0,1,0xFFFF00FF,0,0},
-	{10, 200,0,1,0xFFFFFF00,0,0}
+	{200,10, 0,1,0xFF00FFFF,1,0},
+	{200,200,0,1,0xFFFF00FF,1,1},
+	{10, 200,0,1,0xFFFFFF00,0,1}
 };
 
 using DirectX9Wrapper::Dx9;
@@ -55,7 +55,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR lpCmdLine,
 	//	テクスチャの読み込み
 	D3DXCreateTextureFromFile(
 		dx9.pD3Device,
-		_T("Blank.jpg"),
+		_T("nigaoe.jpg"),
 		&dx9.pTexture[_T("test")]);
 
 	MessageLoop();
@@ -149,8 +149,10 @@ int MessageLoop()
 			if (SyncCurr - SyncPrev >= 1000 / 60)
 			{
 				//ウィンドウを黒色でクリア
+				//黒板を消す
 				dx9.pD3Device->Clear(0, NULL, D3DCLEAR_TARGET, D3DCOLOR_XRGB(0x00, 0x00, 0x00), 1.0, 0);
 				//テクスチャ貼り付け開始
+				//チョークを持つ
 				dx9.pD3Device->BeginScene();
 				
 				//エンター押下でループを抜ける
@@ -158,14 +160,30 @@ int MessageLoop()
 				if (dx9.GetKeyState(DIK_RETURN)) {
 					break;
 				}
+				if (dx9.GetKeyState(DIK_A)) {
+					++customVertex[0].x;
+				}
+				if (dx9.GetKeyState(DIK_W)) {
+					++customVertex[0].y;
+				}
+				if (dx9.GetKeyState(DIK_D)) {
+					--customVertex[0].x;
+				}
+				if (dx9.GetKeyState(DIK_S)) {
+					--customVertex[0].y;
+				}
 
 				//テクスチャの貼り付け
+				//ピカチュウを書けと言われる
 				dx9.pD3Device->SetTexture(0, dx9.pTexture[_T("test")]);
+				//言われた場所に言われた大きさで書き始める
 				dx9.pD3Device->DrawPrimitiveUP(D3DPT_TRIANGLEFAN, 2, customVertex, sizeof(CUSTOMVERTEX));
 
 				//テクスチャの貼り付け終了
+				//書き終わる　チョークを置く
 				dx9.pD3Device->EndScene();
 				//ウィンドウに表示
+				//黒板を見てください
 				dx9.pD3Device->Present(0, 0, 0, 0);
 
 				SyncPrev = SyncCurr;
