@@ -49,3 +49,8 @@ Sample/Release/Sample.tlog/
 Sample/x64/Debug/Sample.tlog/
 DirectX9/x64/Debug/DirectX9.tlog/
 Sample/Debug/Sample.tlog/
+*.pdb
+*.idb
+*.log
+*.tlog
+*.ilk
