@@ -161,16 +161,16 @@ int MessageLoop()
 					break;
 				}
 				if (dx9.GetKeyState(DIK_A)) {
-					++customVertex[0].x;
+					customVertex[0].x+=5.f;
 				}
 				if (dx9.GetKeyState(DIK_W)) {
-					++customVertex[0].y;
+					customVertex[0].y+=5.f;
 				}
 				if (dx9.GetKeyState(DIK_D)) {
-					--customVertex[0].x;
+					customVertex[0].x-=5.f;
 				}
 				if (dx9.GetKeyState(DIK_S)) {
-					--customVertex[0].y;
+					customVertex[0].y-=5.f;
 				}
 
 				//テクスチャの貼り付け

@@ -166,16 +166,16 @@ int MessageLoop()
 					break;
 				}
 				if (dx9.GetKeyState(DIK_A)) {
-					--topLeftPosition.x;
+					topLeftPosition.x-=5.f;
 				}
 				if (dx9.GetKeyState(DIK_W)) {
-					--topLeftPosition.y;
+					topLeftPosition.y -= 5.f;
 				}
 				if (dx9.GetKeyState(DIK_D)) {
-					++topLeftPosition.x;
+					topLeftPosition.x += 5.f;
 				}
 				if (dx9.GetKeyState(DIK_S)) {
-					++topLeftPosition.y;
+					topLeftPosition.y += 5.f;
 				}
 				CUSTOMVERTEX customVertex[4]{
 					{topLeftPosition.x,							topLeftPosition.y,							0,1,0xFFFFFFFF,0,0},
@@ -210,8 +210,8 @@ int MessageLoop()
 
 void Cage(CUSTOMVERTEX* vertex,TOPLEFT_POSITION position)
 {
-	if (position.x >= vertex[0].x  || vertex[1]..x >= position.width
-		|| position.y >= vertex[0].y || vertex[].y >= position.height) {
+	if (position.x >= vertex[0].x  || vertex[1].x >= position.width
+		|| position.y >= vertex[0].y || vertex[3].y >= position.height) {
 
 		if (position.x >= vertex[0].x) {
 			vertex[0].x = position.x;
